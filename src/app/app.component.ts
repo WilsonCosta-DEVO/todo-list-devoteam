@@ -27,10 +27,15 @@ export class AppComponent {
   }
 
   toggleComplete(index: number): void {
-    this.todoListService.toggleComplete(index)
+    const task = this.todoList$.value[index];
+    task.completed = !task.completed;
+    localStorage.setItem('todoList', JSON.stringify(this.todoList$.value));
+    this.todoListService.toggleComplete(index);
   }
 
   deleteTask(id: number): void {
+    const updatedList = this.todoList$.value.filter(item => item.id !== id);
     this.todoListService.deleteTask(id);
+    localStorage.setItem('todoList', JSON.stringify(updatedList));
   }
 }
