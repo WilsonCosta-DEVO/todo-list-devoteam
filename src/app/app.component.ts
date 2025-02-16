@@ -23,14 +23,28 @@ export class AppComponent {
   addTask(): void {
     if (this.newTask.trim()) {
       this.todoListService.addTask(this.newTask.trim())
+
+      const list = document.getElementById('task-list');
+      if (list) {
+        const li = document.createElement('li');
+        li.textContent = this.newTask;
+        list.appendChild(li);
+      }
     }
   }
 
-  toggleComplete(index: number): void {
-    this.todoListService.toggleComplete(index)
+  toggleComplete(id: number): void {
+    const taskElement = document.getElementById(`task-${id}`);
+    if (taskElement) {
+      taskElement.style.textDecoration =
+        taskElement.style.textDecoration === 'line-through' ? 'none' : 'line-through';
+    }
   }
 
   deleteTask(id: number): void {
-    this.todoListService.deleteTask(id);
+    const taskElement = document.getElementById(`task-${id}`);
+    if (taskElement) {
+      taskElement.remove();
+    }
   }
 }
