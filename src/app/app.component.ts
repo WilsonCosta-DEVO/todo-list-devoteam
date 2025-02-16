@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import {TodoItem} from '../model/TodoItem';
 import {FormsModule} from '@angular/forms';
@@ -12,17 +12,30 @@ import {Observable} from 'rxjs';
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
-export class AppComponent {
-  todoList$: Observable<TodoItem[]>;
+export class AppComponent implements OnInit, OnDestroy {
+  todoList: TodoItem[] = [];
   newTask: string = '';
+  intervalId: any;
 
-  constructor(private todoListService: TodoListService) {
-    this.todoList$ = this.todoListService.getTodoList();
+  constructor(private todoListService: TodoListService) {}
+
+  ngOnInit(): void {
+    this.fetchTodoList();
+    this.intervalId = setInterval(() => {
+      this.fetchTodoList();
+    }, 5000);
+  }
+
+  fetchTodoList(): void {
+    this.todoListService.getTodoList().subscribe((todos) => {
+      this.todoList = todos;
+    });
   }
 
   addTask(): void {
     if (this.newTask.trim()) {
       this.todoListService.addTask(this.newTask.trim())
+      this.fetchTodoList();
     }
   }
 
@@ -32,5 +45,9 @@ export class AppComponent {
 
   deleteTask(id: number): void {
     this.todoListService.deleteTask(id);
+  }
+
+  ngOnDestroy(): void {
+    clearInterval(this.intervalId);
   }
 }
